@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .weather-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease-in-out;
+            width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .weather-card:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2196F3;
+        }
+
+        #city-input {
+            padding: 15px;
+            margin: 10px 0;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        #city-input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        #city-input::placeholder {
+            color: #aaa;
+        }
+
+        #city-input-btn {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #city-input-btn:hover {
+            background-color: #1565C0;
+        }
+
+        #weather-info {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #weather-icon {
+            width: 100px;
+            height: 100px;
+        }
+
+        #temperature {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 8px 0;
+            color: #FFD700;
+        }
+
+        #description {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        #wind-speed {
+            font-size: 1rem;
+            color: #FF6347;
+        }
+
+        #date {
+            font-size: 0.9rem;
+            color: #FF6347;
+        }
+
+        .toggle-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        #unit-label {
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #FFD700;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="weather-card">
+            <h1>Group 4</h1>
+            <h3>Weather </h3>
+            <input type="text" id="city-input" placeholder="Enter city name">
+            <button id="city-input-btn" onclick="weatherFn($('#city-input').val())">Get Weather</button>
+            
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner"></i>Loading...
+            </div>
+            <div id="weather-info" class="animate__animated animate__fadeIn">
+                <h3 id="city-name"></h3>
+                <p id="date"></p>
+                <p id="temperature"></p>
+                <p id="description"></p>
+                <p id="wind-speed"></p>
+            </div>
+            
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="unit-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <span id="unit-label">°C</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script>
+        const url = 'https://api.openweathermap.org/data/2.5/weather';
+        const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
+        let isCelsius = true; 
+
+        $(document).ready(function () {
+            weatherFn('Pune');
+            $('#unit-toggle').change(function () {
+                isCelsius = !isCelsius;
+                $('#unit-label').text(isCelsius ? '°C' : '°F');
+                const city = $('#city-input').val();
+                if (city) {
+                    weatherFn(city); 
+                }
+            });
+        });
+
+        async function weatherFn(cName) {
+            $('#loading').show(); 
+            $('#weather-info').hide(); 
+            const unit = isCelsius ? 'metric' : 'imperial';
+            const temp = `${url}?q=${cName}&appid=${apiKey}&units=${unit}`;
+            try {
+                const res = await fetch(temp);
+                const data = await res.json();
+                if (res.ok) {
+                    weatherShowFn(data);
+                } else {
+                    alert('City not found. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            } finally {
+                $('#loading').hide(); 
+            }
+        }
+
+        function weatherShowFn(data) {
+            $('#city-name').text(data.name);
+            $('#date').text(moment().format('MMMM Do YYYY, h:mm:ss a'));
+            const temp = isCelsius ? `${data.main.temp}°C` : `${data.main.temp}°F`;
+            $('#temperature').html(temp);
+            $('#description').text(data.weather[0].description);
+            $('#wind-speed').html(`Wind Speed: ${data.wind.speed} ${isCelsius ? 'm/s' : 'mph'}`);
+            $('#weather-info').fadeIn(); 
+        }
+    </script>
+</body>
+</html>
